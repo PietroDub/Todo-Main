@@ -7,11 +7,12 @@ export default function TodoForm() {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [dataLimite, setDataLimite] = useState("");
-  const [situacao, setSituacao] = useState("Pendente");
+  const [situacao, setSituacao] = useState("pendente");
   const [participam, setParticipam] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [loadingUsuarios, setLoadingUsuarios] = useState(true);
 
+  
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const {
@@ -78,6 +79,7 @@ export default function TodoForm() {
       });
       navigate("/tarefas");
     } catch (error) {
+      console.error("Erro ao criar tarefa:", error.response?.data || error.message );
       alert(
         "Erro ao criar tarefa: " +
           (error.response?.data?.message || error.message),

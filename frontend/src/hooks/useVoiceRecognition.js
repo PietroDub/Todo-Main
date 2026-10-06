@@ -11,7 +11,7 @@ function interpretarDataVoz(texto) {
   if (fala.includes("amanhã") || fala.includes("amanha")) {
     const amanha = new Date();
     amanha.setDate(hoje.getDate() + 1);
-    return depoisAmanha.toISOString().split("T")[0];
+    return amanha.toISOString().split("T")[0];
   }
 
   if (fala.includes("depois de amanhã") || fala.includes("depois de amanha")) {
@@ -25,7 +25,7 @@ function interpretarDataVoz(texto) {
     const dias = parseInt(matchDias[1], 10);
     const dataFutura = new Date();
     dataFutura.setDate(hoje.getDate() + dias);
-    return dataFutura.toISOString().split["T"][0];
+    return dataFutura.toISOString().split("T")[0];
   }
 
   return "";
@@ -58,7 +58,12 @@ export function useVoiceRecognition() {
           let transcricaoFinal = "";
           // Acumula todos os trechos da fala confirmados
           // Durante a sessão ativa
-          for (let i = event.resultIndex; i < event.result.length; i++) {
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            console.log({
+              transcricao: event.results[i][0].transcript,
+              final: event.results[i].isFinal,
+              confianca: event.results[i][0].confidence,
+            });
             if (event.results[i].isFinal) {
               transcricaoFinal += event.results[i][0].transcript + " ";
             }
@@ -69,7 +74,11 @@ export function useVoiceRecognition() {
 
         // Evento erro
         recognition.onerror = (event) => {
-          console.error("Erro no reconhecimento de voz:", event.error);
+          console.error("Erro no reconhecimento de voz:", {
+            tipo: event.error,
+            mensagem: event.message,
+          });
+
           setOuvindo(false);
         };
 
@@ -120,11 +129,11 @@ export function useVoiceRecognition() {
     handleCheckboxChange,
   ) => {
     // Expressões regulares
-    const regexTitulo = /(?:título|titulo)\s+(.+)/i;
-    const regexDescricao = /(?:descrição|descricao)\s+(.+)/i;
+    const regexTitulo = /(?:título|titulo)[,:]?\s+(.+)/i;
+    const regexDescricao = /(?:descrição|descricao)[,:]?\s+(.+)/i;
     const regexData = /(?:data|data limite|prazo)\s+(.+)/i;
     const regexParticipantes =
-      /(?:participante|participantes|adicionar|incluir)\s+(.+)/i;
+      /(?:participante|participantes|adicionar|incluir)[,:]?\s+(.+)/i;
 
     // Match Participante
     const matchParticipante = fala.match(regexParticipantes);

@@ -11,6 +11,8 @@ const api = axios.create({
 // Tarefas
 export const listarTarefas = () => api.get("/tarefas");
 export const criarTarefa = (task) => api.post("/tarefas", task);
+export const atualizarSituacaoTarefa = (tarefaId, situacao) =>
+  api.patch(`/tarefas/${tarefaId}/situacao`, { situacao });
 
 // Usuários
 export const registrarUsuario = (usuario) => api.post("/usuarios", usuario);

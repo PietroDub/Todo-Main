@@ -8,6 +8,14 @@ export default function TodoList({ usuarioLogado }) {
   const [error, setError] = useState(null);
   const [tarefas, setTarefas] = useState([]);
 
+  const handleTarefaAtualizada = (tarefaAtualizada) => {
+    setTarefas((tarefasAtuais) =>
+      tarefasAtuais.map((tarefa) =>
+        tarefa._id === tarefaAtualizada._id ? tarefaAtualizada : tarefa,
+      ),
+    );
+  };
+
   useEffect(() => {
     const carregarTarefas = async () => {
       setLoading(true);
@@ -46,7 +54,12 @@ export default function TodoList({ usuarioLogado }) {
           <p className="text-gray-500">Nenhuma Tarefa encontrada!</p>
         ) : (
           tarefas?.map((t) => (
-            <TodoItem key={t._id} todo={t} usuarioLogado={usuarioLogado} />
+            <TodoItem
+              key={t._id}
+              todo={t}
+              usuarioLogado={usuarioLogado}
+              onTarefaAtualizada={handleTarefaAtualizada}
+            />
           ))
         )}
       </div>

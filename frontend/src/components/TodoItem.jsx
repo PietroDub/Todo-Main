@@ -1,8 +1,34 @@
 import { useState } from "react";
 import TodoChatModal from "./TodoChatModal";
+import { atualizarSituacaoTarefa } from "../api";
 
-export default function TodoItem({ todo, usuarioLogado }) {
+const situacoes = {
+  pendente: {
+    label: "Pendente",
+    classes: "bg-yellow-100 text-yellow-800",
+  },
+  "em andamento": {
+    label: "Em andamento",
+    classes: "bg-blue-100 text-blue-700",
+  },
+  concluida: {
+    label: "Concluída",
+    classes: "bg-green-100 text-green-700",
+  },
+  cancelada: {
+    label: "Cancelada",
+    classes: "bg-gray-100 text-gray-700",
+  },
+};
+
+export default function TodoItem({
+  todo,
+  usuarioLogado,
+  onTarefaAtualizada,
+}) {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [atualizandoSituacao, setAtualizandoSituacao] = useState(false);
+  const [erroSituacao, setErroSituacao] = useState("");
 
   // Extrai as iniciais do nome (ex: "Carlos Silva" -> "CS")
   const getInitials = (nome) => {
@@ -22,6 +48,30 @@ export default function TodoItem({ todo, usuarioLogado }) {
 
   // Lista com todos os nomes para tooltip
   const todosNomesParticipantes = participantes.map((p) => p.nome).join(", ");
+  const situacaoAtual = situacoes[todo.situacao] || {
+    label: todo.situacao,
+    classes: "bg-gray-100 text-gray-700",
+  };
+
+  const handleSituacaoChange = async (event) => {
+    const novaSituacao = event.target.value;
+
+    if (novaSituacao === todo.situacao) return;
+
+    try {
+      setAtualizandoSituacao(true);
+      setErroSituacao("");
+
+      const response = await atualizarSituacaoTarefa(todo._id, novaSituacao);
+      onTarefaAtualizada(response.data.tarefa);
+    } catch (error) {
+      setErroSituacao(
+        error.response?.data?.message || "Não foi possível atualizar a situação.",
+      );
+    } finally {
+      setAtualizandoSituacao(false);
+    }
+  };
 
   return (
     <>
@@ -36,16 +86,30 @@ export default function TodoItem({ todo, usuarioLogado }) {
           </div>
 
           <span
-            className={`px-2.5 py-1 text-xs font-semibold rounded-full shrink-0 ${
-              todo.situacao === "Concluida"
-                ? "bg-green-100 text-green-700"
-                : todo.situacao === "Pendente"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-gray-100 text-gray-700"
-            }`}
+            className={`px-2.5 py-1 text-xs font-semibold rounded-full shrink-0 ${situacaoAtual.classes}`}
           >
-            {todo.situacao}
+            {situacaoAtual.label}
           </span>
+
+          <div className="flex flex-col items-end gap-1">
+            <select
+              aria-label={`Alterar situação da tarefa ${todo.titulo}`}
+              value={todo.situacao}
+              onChange={handleSituacaoChange}
+              disabled={atualizandoSituacao}
+              className="rounded-lg border border-gray-300 bg-white px-2.5 py-1 text-xs text-gray-700 disabled:cursor-wait disabled:opacity-60"
+            >
+              <option value="pendente">Pendente</option>
+              <option value="em andamento">Em andamento</option>
+              <option value="concluida">Concluída</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
+            {erroSituacao && (
+              <span className="max-w-48 text-right text-xs text-red-600">
+                {erroSituacao}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Rodapé do Card: Infos + Equipe + Botão de Chat */}

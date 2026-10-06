@@ -19,8 +19,8 @@ const tarefaSchema = new Schema(
     situacao: {
       type: String,
       required: true,
-      enum: ["pendente", "cancelado", "finalizado"],
-      default: "pendente"
+      enum: ["pendente", "em andamento", "concluida", "cancelada"],
+      default: "pendente",
     },
     criadaPor: {
       type: Schema.Types.ObjectId,

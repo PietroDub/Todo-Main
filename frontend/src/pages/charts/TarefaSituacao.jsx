@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
-import './styles.css'
+import '../../index.css'
 
 const ApexChart = () => {
   const [state, setState] = React.useState({
