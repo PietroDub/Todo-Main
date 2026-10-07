@@ -9,6 +9,7 @@ import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/Forgot";
 import ResetPassword from "./pages/Reset";
+import TarefaSituacao from "./pages/charts/TarefaSituacao";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -91,6 +92,12 @@ export default function App() {
                       >
                         Tarefas
                       </Link>
+                      <Link
+                        to="/graficos"
+                        className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                      >
+                        Gráficos
+                      </Link>
                       <button
                         onClick={handleLogout}
                         className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors cursor-pointer"
@@ -120,6 +127,16 @@ export default function App() {
                   element={
                     isAuthenticated ? (
                       <TodoForm />
+                    ) : (
+                      <Navigate to="/login" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="graficos"
+                  element={
+                    isAuthenticated ? (
+                      <TarefaSituacao />
                     ) : (
                       <Navigate to="/login" replace />
                     )
